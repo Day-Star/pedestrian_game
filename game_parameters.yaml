@@ -1,0 +1,94 @@
+model_set: log2
+
+models:
+  base_dir: models
+  log:
+    actor: log_actor.onnx
+    critic: log_critic.onnx
+    disturbance: log_disturbance.onnx
+  log2:
+    actor: log2_actor.onnx
+    critic: log2_critic.onnx
+    disturbance: log2_disturbance.onnx
+  supervised: pedestrian_supervised.onnx
+  decoder: pedestrian_decoder.onnx
+
+ares:
+  level_zero: -0.11 # log1
+  #level_zero: -0.15 # log2
+  error_horizon_steps: 3
+  pipeline_every_step: true
+  pipeline_period_steps: 1
+  disturbance_bounds: 0.4
+  duplicate_single_pedestrian: true
+  safe_set_type: whole # options: whole or local
+  safe_set_resolution: 30
+  safe_set_display_type: square # options: squares, lines
+  safe_set_refresh_frames: 1
+
+game:
+  dt: 0.1
+  max_episode_steps: 800
+  arena_size: 25.0
+  pixels_per_meter: 50.0
+  banner_height_px: 80
+  draw_safe_set: true
+  draw_target: true
+  target_pos: [10.0, 10.0]
+
+ego:
+  max_speed: 2.5
+  start_pos: [-10.0, -10.0]
+  start_heading: 0.0
+
+pedestrian:
+  count: 1
+  max_speed: 1.5
+  other_pedestrian_speed: [0.5, -1.0]
+  other_pedestrian_start_pos: [[0.0, 0.0]]
+  other_pedestrian_mode: npc # options: npc or manual
+
+nominal:
+  controller: mpc
+  speed: 0.0
+  square_side: 4.0
+  mpc:
+    dt: 0.1
+    horizon: 10
+    max_iter: 40
+    ftol: 1.0e-4
+    weight_pos: 5.0
+    weight_heading: 0.0
+    weight_speed: 0.5
+    weight_omega: 0.0
+    weight_control: 0.0
+
+onnx_io:
+  actor:
+    input: obs
+    output: action
+    obs_dim: 17
+    action_dim: 2
+  critic:
+    inputs:
+      obs: obs
+      action: action
+    output: q_value
+    obs_dim: 17
+    action_dim: 6
+    output_dim: 1
+  disturbance:
+    input: obs
+    output: disturbance
+    obs_dim: 17
+    output_dim: 4
+  supervised:
+    input: trajectory
+    output: latent
+    input_dim: 14
+    output_dim: 3
+  decoder:
+    input: latent
+    output: parameters
+    input_dim: 3
+    output_dim: 132

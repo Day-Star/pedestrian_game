@@ -14,8 +14,8 @@ models:
   decoder: pedestrian_decoder.onnx
 
 ares:
-  level_zero: -0.11 # log1
-  #level_zero: -0.15 # log2
+  #level_zero: -0.1 # log1
+  level_zero: -0.15 # log2
   error_horizon_steps: 3
   pipeline_every_step: true
   pipeline_period_steps: 1
